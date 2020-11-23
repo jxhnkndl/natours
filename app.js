@@ -24,16 +24,41 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// GET Request Route Handler: Get specific tour by identifier
+app.get('/api/v1/tours/:id', (req, res) => {
+  console.log(req.params);
+
+  // Convert endpoint variable to number and locate the requested resource
+  const id = req.params.id * 1;
+  const tour = tours.find(item => item.id === id)
+
+  // Verify that requested resource exists; if not, return 404 response
+  if (!tour) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID'
+    });
+  }
+
+  // If requested resource is located, return 200 response
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: tour
+    }
+  });
+});
+
 // POST Request Route Handler: Post a new tour
 app.post('/api/v1/tours', (req, res) => {
 
-  // Create ID for new resource
+  // Create new ID and new object for added tour resource; push it into the tours array
   const newId = tours[tours.length -1].id + 1;
-
   const newTour = Object.assign({id: newId}, req.body);
-
   tours.push(newTour);
 
+  // Persist the new tour resource into the tours-simple.json data object
+  // Send back resource created response to the client
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`, 
     JSON.stringify(tours), 
