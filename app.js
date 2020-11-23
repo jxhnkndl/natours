@@ -72,6 +72,25 @@ app.post('/api/v1/tours', (req, res) => {
   });
 });
 
+// PATCH Request Route Handler: Update a tour resource
+app.patch('/api/v1/tours/:id', (req, res) => {
+
+  // Check whether the id is valid; if it's greater than tours.length, then it is invalid
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID'
+    });
+  }
+
+  // If id is valid, return 200 response
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here...>'
+    }
+  });
+});
 
 // Start the server and listen for requests on port 3000
 const port = 3000;
