@@ -72,7 +72,7 @@ app.post('/api/v1/tours', (req, res) => {
   });
 });
 
-// PATCH Request Route Handler: Update a tour resource
+// PATCH Request Route Handler: Update a tour resource (not fully implemented)
 app.patch('/api/v1/tours/:id', (req, res) => {
 
   // Check whether the id is valid; if it's greater than tours.length, then it is invalid
@@ -89,6 +89,24 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     data: {
       tour: '<Updated tour here...>'
     }
+  });
+});
+
+// DELETE Request Route Handler: Delete a resource (not fully implemented)
+app.delete('/api/v1/tours/:id', (req, res) => {
+
+  // Check whether the id is valid; if it's greater than tours.length, then it is invalid
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID'
+    });
+  }
+
+  // If id is valid, return 204: No Content response with data: null
+  res.status(204).json({
+    status: 'success',
+    data: null
   });
 });
 
