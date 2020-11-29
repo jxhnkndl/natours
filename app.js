@@ -13,8 +13,8 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-// GET Request Route Handler: Get all tours
-app.get('/api/v1/tours', (req, res) => {
+// GET Request Route Handler: Get All Tours
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -22,10 +22,10 @@ app.get('/api/v1/tours', (req, res) => {
       tours: tours
     }
   });
-});
+}
 
-// GET Request Route Handler: Get specific tour by identifier
-app.get('/api/v1/tours/:id', (req, res) => {
+// GET Request Route Handler: Get Tour by ID
+const getTour = (req, res) => {
   console.log(req.params);
 
   // Convert endpoint variable to number and locate the requested resource
@@ -47,21 +47,24 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour: tour
     }
   });
-});
+}
 
-// POST Request Route Handler: Post a new tour
-app.post('/api/v1/tours', (req, res) => {
+// POST Request Route Handler: Create Tour
+const createTour = (req, res) => {
 
   // Create new ID and new object for added tour resource; push it into the tours array
-  const newId = tours[tours.length -1].id + 1;
+  const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({id: newId}, req.body);
   tours.push(newTour);
 
   // Persist the new tour resource into the tours-simple.json data object
   // Send back resource created response to the client
   fs.writeFile(
+    // Where to write it
     `${__dirname}/dev-data/data/tours-simple.json`, 
+    // The data to write
     JSON.stringify(tours), 
+    // What to do when the operation is complete
     err => {
     res.status(201).json({
       status: 'success',
@@ -70,10 +73,10 @@ app.post('/api/v1/tours', (req, res) => {
       }
     });
   });
-});
+}
 
-// PATCH Request Route Handler: Update a tour resource (not fully implemented)
-app.patch('/api/v1/tours/:id', (req, res) => {
+// PATCH Request Route Handler: Update Tour
+const updateTour = (req, res) => {
 
   // Check whether the id is valid; if it's greater than tours.length, then it is invalid
   if (req.params.id * 1 > tours.length) {
@@ -90,10 +93,10 @@ app.patch('/api/v1/tours/:id', (req, res) => {
       tour: '<Updated tour here...>'
     }
   });
-});
+}
 
-// DELETE Request Route Handler: Delete a resource (not fully implemented)
-app.delete('/api/v1/tours/:id', (req, res) => {
+// DELETE Request Route Handler: Delete Tour
+const deleteTour = (req, res) => {
 
   // Check whether the id is valid; if it's greater than tours.length, then it is invalid
   if (req.params.id * 1 > tours.length) {
@@ -108,7 +111,27 @@ app.delete('/api/v1/tours/:id', (req, res) => {
     status: 'success',
     data: null
   });
-});
+}
+
+// Endpoint Routes: Part I
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+// Endpoint Routes: Part II
+// Using the .route() method allows for chaining different http methods and their route handlers
+// This way, if something about the endpoint needs to change, it can be changed in a single location
+
+app.route('/api/v1/tours')
+  .get(getAllTours)
+  .post(createTour);
+
+app.route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 // Start the server and listen for requests on port 3000
 const port = 3000;
