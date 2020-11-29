@@ -8,6 +8,22 @@ const app = express();
 // Init Middleware 
 app.use(express.json());
 
+// Custom Middleware 1: Simple log statement
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 🌶');
+
+  // Call next() to push the req/res objects to the next function
+  next();
+}); 
+
+// Custom Middleware 2: Manipulate req object
+app.use((req, res, next) => {
+  // Add requestTime property containing current date/time to req object
+  req.requestTime = new Date().toISOString();
+  // Call next() to move to the next function in the middleware stack
+  next();
+});
+
 // Top Level: Extract data from JSON, read it, and parse it into a JS object
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -15,8 +31,10 @@ const tours = JSON.parse(
 
 // GET Request Route Handler: Get All Tours
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours: tours
@@ -113,17 +131,7 @@ const deleteTour = (req, res) => {
   });
 }
 
-// Endpoint Routes: Part I
-// app.get('/api/v1/tours', getAllTours);
-// app.get('/api/v1/tours/:id', getTour);
-// app.post('/api/v1/tours', createTour);
-// app.patch('/api/v1/tours/:id', updateTour);
-// app.delete('/api/v1/tours/:id', deleteTour);
-
-// Endpoint Routes: Part II
-// Using the .route() method allows for chaining different http methods and their route handlers
-// This way, if something about the endpoint needs to change, it can be changed in a single location
-
+// Endpoint Routes
 app.route('/api/v1/tours')
   .get(getAllTours)
   .post(createTour);
